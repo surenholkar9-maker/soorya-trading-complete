@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soorya Trading - Professional Market Analysis with Upstox</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .status.connected {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status.disconnected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #d0d0d0;
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .content {
+      margin-top: 20px;
+    }
+
+    .card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-left: 4px solid #667eea;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: #999;
+      margin-top: 5px;
+    }
+
+    .error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      border-radius: 6px;
+      color: #721c24;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+
+    .success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 6px;
+      color: #155724;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #667eea;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🌙</div>
+      <div class="title">Soorya Trading</div>
+      <div class="subtitle">Professional Market Analysis with Upstox</div>
+    </div>
+
+    <div id="status" class="status disconnected">Disconnected</div>
+
+    <div class="button-group">
+      <button id="connectBtn" class="btn-primary" onclick="app.connectUpstox()">Connect Upstox</button>
+      <button id="logoutBtn" class="btn-secondary" onclick="app.logout()" disabled>Logout</button>
+    </div>
+
+    <div id="messageContainer"></div>
+
+    <div class="content" id="contentArea" style="display: none;">
+      <div class="card">
+        <div class="card-title">📊 Portfolio Value</div>
+        <div class="card-value" id="portfolioValue">₹0</div>
+        <div class="card-subtitle">Total Holdings</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📈 Day Change</div>
+        <div class="card-value" id="dayChange">+0.00%</div>
+        <div class="card-subtitle">Today's Performance</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎯 Open Orders</div>
+        <div class="card-value" id="openOrders">0</div>
+        <div class="card-subtitle">Active Trades</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'https://soorya-trading-complete.vercel.app';
+
+    const app = {
+      token: null,
+
+      init() {
+        this.checkAuthStatus();
+      },
+
+      checkAuthStatus() {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('access_token');
+        const error = params.get('error');
+
+        if (error) {
+          this.showMessage(`Authentication failed: ${decodeURIComponent(error)}`, 'error');
+          this.logout();
+          return;
+        }
+
+        if (token) {
+          this.token = token;
+          localStorage.setItem('upstox_token', token);
+          this.updateUI();
+          this.showMessage('Successfully connected to Upstox!', 'success');
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } else {
+          const savedToken = localStorage.getItem('upstox_token');
+          if (savedToken) {
+            this.token = savedToken;
+            this.updateUI();
+          }
+        }
+      },
+
+      async connectUpstox() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/auth`);
+          const data = await response.json();
+
+          if (data.authUrl) {
+            window.location.href = data.authUrl;
+          } else {
+            this.showMessage('Failed to get auth URL', 'error');
+          }
+        } catch (error) {
+          this.showMessage(`Connection error: ${error.message}`, 'error');
+        }
+      },
+
+      logout() {
+        this.token = null;
+        localStorage.removeItem('upstox_token');
+        this.updateUI();
+        this.showMessage('Logged out successfully', 'success');
+      },
+
+      updateUI() {
+        const status = document.getElementById('status');
+        const connectBtn = document.getElementById('connectBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const contentArea = document.getElementById('contentArea');
+
+        if (this.token) {
+          status.textContent = 'Connected';
+          status.classList.remove('disconnected');
+          status.classList.add('connected');
+          connectBtn.disabled = true;
+          logoutBtn.disabled = false;
+          contentArea.style.display = 'block';
+          this.fetchData();
+        } else {
+          status.textContent = 'Disconnected';
+          status.classList.remove('connected');
+          status.classList.add('disconnected');
+          connectBtn.disabled = false;
+          logoutBtn.disabled = true;
+          contentArea.style.display = 'none';
+        }
+      },
+
+      async fetchData() {
+        try {
+          const [portfolioRes, tradesRes] = await Promise.all([
+            fetch(`${API_BASE_URL}/api/portfolio`, {
+              headers: { 'Authorization': `Bearer ${this.token}` }
+            }),
+            fetch(`${API_BASE_URL}/api/trades`, {
+              headers: { 'Authorization': `Bearer ${this.token}` }
+            })
+          ]);
+
+          if (portfolioRes.ok) {
+            const portfolio = await portfolioRes.json();
+            this.updatePortfolioUI(portfolio);
+          }
+
+          if (tradesRes.ok) {
+            const trades = await tradesRes.json();
+            this.updateTradesUI(trades);
+          }
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      },
+
+      updatePortfolioUI(data) {
+        const valueEl = document.getElementById('portfolioValue');
+        const changeEl = document.getElementById('dayChange');
+
+        if (data.data && data.data.holdings) {
+          const totalValue = data.data.holdings.reduce((sum, h) => sum + (h.last_price * h.quantity || 0), 0);
+          valueEl.textContent = `₹${Math.round(totalValue).toLocaleString()}`;
+        }
+      },
+
+      updateTradesUI(data) {
+        const ordersEl = document.getElementById('openOrders');
+        if (data.data && Array.isArray(data.data.orders)) {
+          const openCount = data.data.orders.filter(o => o.status === 'OPEN').length;
+          ordersEl.textContent = openCount;
+        }
+      },
+
+      showMessage(message, type) {
+        const container = document.getElementById('messageContainer');
+        const div = document.createElement('div');
+        div.className = type === 'error' ? 'error' : 'success';
+        div.textContent = message;
+        container.appendChild(div);
+        setTimeout(() => div.remove(), 5000);
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => app.init());
+  </script>
+</body>
+</html>
