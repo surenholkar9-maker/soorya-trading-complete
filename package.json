@@ -1,0 +1,17 @@
+{
+  "name": "soorya-trading-complete",
+  "version": "1.0.0",
+  "description": "Clean Upstox OAuth2 Trading Platform - Frontend + Backend + Vercel Integration",
+  "main": "api/auth.js",
+  "scripts": {
+    "dev": "node api/auth.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["upstox", "trading", "oauth2"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "engines": {
+    "node": "20.x"
+  }
+}
